@@ -11,7 +11,7 @@ set('application', 'animalistic:api');
 set('repository', 'https://github.com/titomiguelcosta/animalistic-api.git');
 set('git_tty', false);
 set('keep_releases', 3);
-set('shared_dirs', []);
+set('shared_dirs', ['public/media']);
 set('writable_dirs', ['']);
 set('writable_mode', 'acl');
 
