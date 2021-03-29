@@ -10,4 +10,4 @@ class PhotoSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Photo
-        fields = ['name', 'created_at', 'tags', ]
+        fields = ['id', 'name', 'created_at', 'tags', ]

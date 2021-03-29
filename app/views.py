@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.http import StreamingHttpResponse
 from app.permissions import HasAuthToken
 from app.models import Photo
 from app.serializers import PhotoSerializer
@@ -18,7 +19,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
     permission_classes = [HasAuthToken]
 
     @action(detail=False, methods=['post'])
-    def take():
+    def take(self):
         filename = '%s.jpg' % datetime.now().strftime('%Y%m%d%H%M%S%f')
         camera = PiCamera()
         camera.resolution = (2592, 1944)
@@ -40,3 +41,23 @@ class PhotoViewSet(viewsets.ModelViewSet):
         photo.save()
 
         return Response(photo)
+
+    @action(detail=False, methods=['get'])
+    def stream(self):
+        camera = PiCamera()
+        return StreamingHttpResponse(self.gen(camera))
+
+    def gen(self, camera):
+        while True:
+            f = os.path.join('/tmp', 'stream.jpg')
+            camera = PiCamera()
+            camera.resolution = (1024, 512)
+            camera.capture(f)
+
+            frame = open(f, 'rb').read()
+
+            yield (
+                b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n'
+            )
+    
