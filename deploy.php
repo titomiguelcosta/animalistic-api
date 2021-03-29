@@ -8,7 +8,7 @@ use function Deployer\Support\str_contains;
 require 'recipe/common.php';
 
 set('application', 'animalistic:api');
-set('repository', 'git@github.com:titomiguelcosta/animalistic-api.git');
+set('repository', 'https://github.com/titomiguelcosta/animalistic-api.git');
 set('git_tty', false);
 set('keep_releases', 3);
 set('shared_dirs', []);
@@ -28,15 +28,15 @@ task('workers:restart', function () {
 });
 
 task('database:migrate', function () {
-    run('python {{release_path}}/fusebox/manage.py migrate --noinput');
+    run('python {{release_path}}/manage.py migrate --noinput');
 });
 
 task('publish:assets', function () {
-    run('python {{release_path}}/fusebox/manage.py collectstatic --noinput');
+    run('python {{release_path}}/manage.py collectstatic --noinput');
 });
 
 task('update:dependencies', function () {
-    run('pip install -r {{release_path}}/requirements.txt');
+    run('pip install -r {{release_path}}/requirements.txt', ['timeout' => null]);
 });
 
 desc('Deploy project');
