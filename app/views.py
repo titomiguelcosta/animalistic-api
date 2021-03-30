@@ -41,17 +41,20 @@ class PhotoViewSet(viewsets.ModelViewSet):
     # @see https://github.com/miguelgrinberg/flask-video-streaming
     @action(detail=False, methods=['get'])
     def stream(self, request):
-        self.logger.info('About to start streaming')
-
         return StreamingHttpResponse(self.gen(), content_type='multipart/x-mixed-replace; boundary=frame')
 
     def gen(self):
-        for frame in self.frames():
+        self.logger.info('About to start streaming')
+
+        camera = self._camera()
+        for frame in self.frames(camera):
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-    def frames(self):
-        camera = self._camera()
+        self.logger.info('closing camera')
+        camera.close()
+
+    def frames(self, camera):
         stream = io.BytesIO()
         for _ in camera.capture_continuous(stream, 'jpeg', use_video_port=True):
             self.logger.info('captured a new frame')
@@ -63,9 +66,6 @@ class PhotoViewSet(viewsets.ModelViewSet):
 
             stream.seek(0)
             stream.truncate()
-
-            self.logger.info('closing camera')
-            camera.close()
 
     def _camera(self):
         camera = PiCamera()
