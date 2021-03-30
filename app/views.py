@@ -67,7 +67,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
             stream.truncate()
 
     @receiver(request_finished)
-    def close(self):
+    def close(self, sender, **kwargs):
         self.logger.info('closing connection')
 
         if self.camera is not None:
