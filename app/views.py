@@ -40,7 +40,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
         photo.name = filename
         photo.save()
 
-        return Response(PhotoSerializer(photo))
+        return Response(PhotoSerializer(photo).data)
 
     @action(detail=False, methods=['get'])
     def stream(self, request):
@@ -50,7 +50,6 @@ class PhotoViewSet(viewsets.ModelViewSet):
     def gen(self, camera):
         while True:
             f = os.path.join('/tmp', 'stream.jpg')
-            camera = PiCamera()
             camera.resolution = (1024, 512)
             camera.capture(f)
 
