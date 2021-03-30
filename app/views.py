@@ -24,7 +24,10 @@ class PhotoViewSet(viewsets.ModelViewSet):
         filename = '%s.jpg' % datetime.now().strftime('%Y%m%d%H%M%S%f')
 
         camera = self._camera()
-        camera.capture(os.path.join(settings.MEDIA_ROOT, filename))
+        camera.capture(os.path.join(
+            settings.MEDIA_ROOT, filename),
+            quality=100
+        )
         camera.close()
 
         photo = Photo()
