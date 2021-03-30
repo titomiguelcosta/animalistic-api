@@ -56,12 +56,8 @@ class PhotoViewSet(viewsets.ModelViewSet):
     def frames(self):
         stream = io.BytesIO()
         for _ in PhotoViewSet.camera.capture_continuous(stream, 'jpeg', use_video_port=True):
-            self.logger.info('captured a new frame')
-
             stream.seek(0)
             yield stream.read()
-
-            self.logger.info('finished reading stream')
 
             stream.seek(0)
             stream.truncate()
