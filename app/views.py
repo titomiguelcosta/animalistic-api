@@ -48,7 +48,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
         return StreamingHttpResponse(self.frames())
 
     def frames(self):
-        with picamera.PiCamera() as camera:
+        with PiCamera() as camera:
             # let camera warm up
             time.sleep(2)
 
