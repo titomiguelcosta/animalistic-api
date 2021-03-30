@@ -75,7 +75,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
             logging.getLogger('django').info('camera closed')
 
     @staticmethod
-    def initialize_camera(self):
+    def initialize_camera():
         camera = PiCamera() if PhotoViewSet.camera is None else self.camera
         camera.resolution = (1024, 768)
         camera.saturation = -100
