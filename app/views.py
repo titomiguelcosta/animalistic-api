@@ -68,10 +68,11 @@ class PhotoViewSet(viewsets.ModelViewSet):
 
     @receiver(request_finished)
     def close(sender, **kwargs):
-        self.logger.info('closing connection')
+        logging.getLogger('django').info('closing connection')
 
         if PhotoViewSet.camera is not None:
             PhotoViewSet.camera.close()
+            logging.getLogger('django').info('camera closed')
 
     @staticmethod
     def initialize_camera(self):
