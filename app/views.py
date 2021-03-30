@@ -13,6 +13,8 @@ import os
 import io
 from datetime import datetime
 import logging
+from django.core.signals import request_finished
+from django.dispatch import receiver
 
 
 class PhotoViewSet(viewsets.ModelViewSet):
@@ -20,6 +22,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
     serializer_class = PhotoSerializer
     permission_classes = [HasAuthToken]
     logger = logging.getLogger('django')
+    camera = None
 
     @action(detail=False, methods=['post'])
     def take(self, request):
@@ -44,14 +47,10 @@ class PhotoViewSet(viewsets.ModelViewSet):
         return StreamingHttpResponse(self.gen(), content_type='multipart/x-mixed-replace; boundary=frame')
 
     def gen(self):
-        self.logger.info('About to start streaming')
-
         camera = self._camera()
         for frame in self.frames(camera):
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-        self.logger.info('closing camera')
         camera.close()
 
     def frames(self, camera):
@@ -67,8 +66,15 @@ class PhotoViewSet(viewsets.ModelViewSet):
             stream.seek(0)
             stream.truncate()
 
+    @receiver(request_finished)
+    def close(self):
+        self.logger.info('closing connection')
+
+        if self.camera is not None:
+            self.camera.close()
+
     def _camera(self):
-        camera = PiCamera()
+        camera = PiCamera() if self.camera is None else self.camera
         camera.resolution = (1024, 768)
         camera.saturation = -100
         camera.sharpness = -100
@@ -83,4 +89,6 @@ class PhotoViewSet(viewsets.ModelViewSet):
         # give time to calibrate
         sleep(2)
 
-        return camera
+        self.camera = camera
+
+        return self.camera
