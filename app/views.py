@@ -19,7 +19,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
     permission_classes = [HasAuthToken]
 
     @action(detail=False, methods=['post'])
-    def take(self):
+    def take(self, request):
         filename = '%s.jpg' % datetime.now().strftime('%Y%m%d%H%M%S%f')
         camera = PiCamera()
         camera.resolution = (2592, 1944)
@@ -43,7 +43,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
         return Response(photo)
 
     @action(detail=False, methods=['get'])
-    def stream(self):
+    def stream(self, request):
         camera = PiCamera()
         return StreamingHttpResponse(self.gen(camera))
 
@@ -60,4 +60,3 @@ class PhotoViewSet(viewsets.ModelViewSet):
                 b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n'
             )
-    
