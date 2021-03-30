@@ -45,7 +45,16 @@ class PhotoViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def stream(self, request):
-        return StreamingHttpResponse(self.frames())
+        return StreamingHttpResponse(self.gen())
+
+    def gen(self):
+        while True:
+            frame = self.frames()
+
+            yield (
+                b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n'
+            )
 
     def frames(self):
         with PiCamera() as camera:
