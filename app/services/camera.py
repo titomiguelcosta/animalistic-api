@@ -8,7 +8,7 @@ class Camera():
 
     @staticmethod
     def initialize():
-        camera = PiCamera() if PhotoViewSet.camera is None else PhotoViewSet.camera
+        camera = PiCamera() if Camera.camera is None else Camera.camera
         camera.resolution = (1024, 768)
         camera.saturation = -100
         camera.sharpness = -100
