@@ -7,7 +7,6 @@ from app.models import Photo
 from app.serializers import PhotoSerializer
 from rest_framework.decorators import action
 from app.services.camera import Camera
-from time import sleep
 from django.conf import settings
 import os
 import io
