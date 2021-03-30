@@ -33,7 +33,6 @@ class PhotoViewSet(viewsets.ModelViewSet):
             settings.MEDIA_ROOT, filename),
             quality=100
         )
-        PhotoViewSet.camera.close()
 
         photo = Photo()
         photo.name = filename
@@ -68,11 +67,14 @@ class PhotoViewSet(viewsets.ModelViewSet):
 
         if PhotoViewSet.camera is not None:
             PhotoViewSet.camera.close()
+            PhotoViewSet.camera = None
             logging.getLogger('django').info('camera closed')
 
     @staticmethod
     def initialize_camera():
-        camera = PiCamera() if PhotoViewSet.camera is None else PhotoViewSet.camera
+        try:
+            camera = PiCamera() if PhotoViewSet.camera is None else PhotoViewSet.camera
+        except picamera.exc.PiCameraClosed
         camera.resolution = (1024, 768)
         camera.saturation = -100
         camera.sharpness = -100
