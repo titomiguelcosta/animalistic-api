@@ -25,6 +25,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
 
         camera = self._camera()
         camera.capture(os.path.join(settings.MEDIA_ROOT, filename))
+        camera.close()
 
         photo = Photo()
         photo.name = filename
@@ -51,6 +52,8 @@ class PhotoViewSet(viewsets.ModelViewSet):
 
             stream.seek(0)
             stream.truncate()
+
+        camera.close()
 
     def _camera(self):
         camera = PiCamera()
