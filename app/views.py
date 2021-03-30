@@ -25,7 +25,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
     def take(self, request):
         filename = '%s.jpg' % datetime.now().strftime('%Y%m%d%H%M%S%f')
 
-        Camera.initialize_camera()
+        Camera.initialize()
         Camera.camera.capture(os.path.join(
             settings.MEDIA_ROOT, filename),
             quality=100
@@ -40,7 +40,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
     # @see https://github.com/miguelgrinberg/flask-video-streaming
     @action(detail=False, methods=['get'])
     def stream(self, request):
-        Camera.initialize_camera()
+        Camera.initialize()
 
         return StreamingHttpResponse(self.gen(), content_type='multipart/x-mixed-replace; boundary=frame')
 
