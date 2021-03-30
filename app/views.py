@@ -19,7 +19,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
     queryset = Photo.objects.all()
     serializer_class = PhotoSerializer
     permission_classes = [HasAuthToken]
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger('django')
 
     @action(detail=False, methods=['post'])
     def take(self, request):
