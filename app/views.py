@@ -64,8 +64,8 @@ class PhotoViewSet(viewsets.ModelViewSet):
             stream.seek(0)
             stream.truncate()
 
-        self.logger.info('closing camera')
-        camera.close()
+            self.logger.info('closing camera')
+            camera.close()
 
     def _camera(self):
         camera = PiCamera()
