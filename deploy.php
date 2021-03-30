@@ -11,7 +11,7 @@ set('application', 'animalistic:api');
 set('repository', 'https://github.com/titomiguelcosta/animalistic-api.git');
 set('git_tty', false);
 set('keep_releases', 3);
-set('shared_dirs', ['public/media']);
+set('shared_dirs', ['public/media', 'var/log']);
 set('writable_dirs', ['']);
 set('writable_mode', 'acl');
 
@@ -19,7 +19,7 @@ host('pi')
     ->user('pi')
     ->stage('dev')
     ->set('deploy_path', '/home/pi/animalistic/api')
-    ->set('shared_files', ['.env', 'db.sqlite3'])
+    ->set('shared_files', ['.env', 'db.sqlite3', 'var/log/debug.log'])
     ->set('branch', 'main')
     ->set('env', ['PATH' => '/home/pi/.pyenv/plugins/pyenv-virtualenv/shims:/home/pi/.pyenv/shims:/home/pi/.pyenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin']);
 
