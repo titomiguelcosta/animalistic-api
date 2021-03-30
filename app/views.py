@@ -37,10 +37,10 @@ class PhotoViewSet(viewsets.ModelViewSet):
         camera.capture(os.path.join(settings.MEDIA_ROOT, filename))
 
         photo = Photo()
-        photo.filename = filename
+        photo.name = filename
         photo.save()
 
-        return Response(photo)
+        return Response(PhotoSerializer(photo))
 
     @action(detail=False, methods=['get'])
     def stream(self, request):
