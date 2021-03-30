@@ -72,9 +72,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
 
     @staticmethod
     def initialize_camera():
-        try:
-            camera = PiCamera() if PhotoViewSet.camera is None else PhotoViewSet.camera
-        except picamera.exc.PiCameraClosed
+        camera = PiCamera() if PhotoViewSet.camera is None else PhotoViewSet.camera
         camera.resolution = (1024, 768)
         camera.saturation = -100
         camera.sharpness = -100
