@@ -3,10 +3,7 @@ from rest_framework import serializers
 
 
 class PhotoSerializer(serializers.HyperlinkedModelSerializer):
-    tags = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=Tag.objects.all()
-    )
+    tags = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Photo

@@ -5,10 +5,17 @@ from django.utils.timezone import now
 class Photo(models.Model):
     name = models.CharField(max_length=255)
     created_at = models.DateTimeField(default=now)
+    tags = models.ManyToManyField('Tag', through='PhotoTags')
+
+    def __str__(self):
+        return self.name
 
 
 class Tag(models.Model):
     name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
 
 
 class PhotoTags(models.Model):

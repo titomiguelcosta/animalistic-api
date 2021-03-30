@@ -3,3 +3,5 @@
 /.env
 /public/media
 /var/log/*.log
+__pycache__
+/.vscode
