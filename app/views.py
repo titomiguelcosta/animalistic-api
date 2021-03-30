@@ -22,19 +22,8 @@ class PhotoViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def take(self, request):
         filename = '%s.jpg' % datetime.now().strftime('%Y%m%d%H%M%S%f')
-        camera = PiCamera()
-        camera.resolution = (2592, 1944)
-        camera.saturation = -100
-        camera.sharpness = -100
-        camera.flash_mode = 'torch'
-        camera.image_effect = 'none'
-        camera.rotation = 270
-        camera.color_effects = (128, 128)
-        camera.brightness = 50
-        camera.contrast = 50
-        camera.awb_mode = 'shade'
-        camera.exposure_mode = 'antishake'
-        sleep(2)
+
+        camera = self._camera()
         camera.capture(os.path.join(settings.MEDIA_ROOT, filename))
 
         photo = Photo()
@@ -43,6 +32,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
 
         return Response(PhotoSerializer(photo).data)
 
+    # @see https://github.com/miguelgrinberg/flask-video-streaming
     @action(detail=False, methods=['get'])
     def stream(self, request):
         return StreamingHttpResponse(self.gen(), content_type='multipart/x-mixed-replace; boundary=frame')
@@ -53,16 +43,29 @@ class PhotoViewSet(viewsets.ModelViewSet):
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
     def frames(self):
-        with PiCamera() as camera:
-            # let camera warm up
-            sleep(2)
+        camera = self._camera()
+        stream = io.BytesIO()
+        for _ in camera.capture_continuous(stream, 'jpeg', use_video_port=True):
+            stream.seek(0)
+            yield stream.read()
 
-            stream = io.BytesIO()
-            for _ in camera.capture_continuous(stream, 'jpeg', use_video_port=True):
-                # return current frame
-                stream.seek(0)
-                yield stream.read()
+            stream.seek(0)
+            stream.truncate()
 
-                # reset stream for next frame
-                stream.seek(0)
-                stream.truncate()
+    def _camera(self):
+        camera = PiCamera()
+        camera.resolution = (1024, 768)
+        camera.saturation = -100
+        camera.sharpness = -100
+        camera.flash_mode = 'torch'
+        camera.image_effect = 'none'
+        camera.rotation = 270
+        camera.color_effects = (128, 128)
+        camera.brightness = 50
+        camera.contrast = 50
+        camera.awb_mode = 'shade'
+        camera.exposure_mode = 'antishake'
+        # give time to calibrate
+        sleep(2)
+
+        return camera
