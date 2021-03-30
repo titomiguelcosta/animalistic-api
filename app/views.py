@@ -10,6 +10,7 @@ from picamera import PiCamera
 from time import sleep
 from django.conf import settings
 import os
+import io
 from datetime import datetime
 
 
@@ -34,9 +35,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
         camera.awb_mode = 'shade'
         camera.exposure_mode = 'antishake'
         sleep(2)
-        camera.start_preview()
         camera.capture(os.path.join(settings.MEDIA_ROOT, filename))
-        camera.stop_preview()
 
         photo = Photo()
         photo.name = filename
@@ -46,18 +45,19 @@ class PhotoViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def stream(self, request):
-        camera = PiCamera()
-        return StreamingHttpResponse(self.gen(camera))
+        return StreamingHttpResponse(self.frames())
 
-    def gen(self, camera):
-        while True:
-            f = os.path.join('/tmp', 'stream.jpg')
-            camera.resolution = (1024, 512)
-            camera.capture(f)
+    def frames(self):
+        with picamera.PiCamera() as camera:
+            # let camera warm up
+            time.sleep(2)
 
-            frame = open(f, 'rb').read()
+            stream = io.BytesIO()
+            for _ in camera.capture_continuous(stream, 'jpeg', use_video_port=True):
+                # return current frame
+                stream.seek(0)
+                yield stream.read()
 
-            yield (
-                b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n'
-            )
+                # reset stream for next frame
+                stream.seek(0)
+                stream.truncate()
