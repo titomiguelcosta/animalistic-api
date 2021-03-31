@@ -9,3 +9,4 @@ python-dotenv==0.10.3
 Werkzeug==0.15.4
 whitenoise==5.2.0
 picamera
+sentry-sdk
